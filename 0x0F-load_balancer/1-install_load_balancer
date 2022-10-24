@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
-# Configures a new Ubuntu server with a HAproxy load-balancer
-apt-get -y install software-properties-common
-add-apt-repository -y ppa:vbernat/haproxy-1.8
-apt-get -y update
-apt-get -y install haproxy=1.8.\*
-sed -i '/errorfile 504/a listen thelaura' /etc/haproxy/haproxy.cfg
-sed -i '/listen thelaura/a         bind :80' /etc/haproxy/haproxy.cfg
-sed -i '/bind :80/a         mode http' /etc/haproxy/haproxy.cfg
-sed -i '/mode http/a         server 31344-web-01 18.205.56.116:80 check' /etc/haproxy/haproxy.cfg
-sed -i '/server 31344-web-01 18.205.56.116:80 check/a         server 31344-web-02 18.233.65.208:80 check' /etc/haproxy/haproxy.cfg
-sed -i '/#EXTRAOPTS="-de -m 16"/a ENABLED=1' /etc/default/haproxy
-service haproxy start
+# Install and configure HAproxy on your lb-01 server
+sudo apt-get update -y
+sudo apt-get install -y haproxy=2.6.\*
+# enable HAProxy
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
+config="\nfrontend node-http\n\tbind *:80\n\tmode http\n\tdefault_backend web-backend\n\nbackend web-backend\n\tbalance roundrobin\n\toption forwardfor\n\tserver 31344-web-01 18.205.56.116:80 check\n\tserver 31344-web-02 18.233.65.208:80 check\n\n"
+echo -e "$config" | sudo tee -a /etc/haproxy/haproxy.cfg
+sudo service haproxy start
