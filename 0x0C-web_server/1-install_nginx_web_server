@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# Installs nginx web server on a new ubuntu server
-sudo apt update
-sudo apt install -y nginx
-sudo ufw allow 'Nginx HTTP'
-# echo "Hello World!" | sudo tee /var/www/html/index.html
-# OR
-echo "Hello World!" | tee /var/www/html/index.nginx-debian.html
-sudo service nginx restart
+# Install nginx on web server; Nginx should be listening on port 80
+# Querying Nginx at its root (/) with a GET request (requesting a page)
+#    curl http://18.205.56.116/   --> returns string "Hello World!"
+
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y install nginx
+sudo service nginx start
+sudo sh -c 'echo "Hello World!" > /var/www/html/index.html'
+sudo rm /var/www/html/index.nginx-debian.html
